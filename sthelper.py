@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Sleeping Troubles v.0.1.2
+Sleeping Troubles v0.1.2
 
 Sleeping Troubles is a simple board game, developed with Python and Pygame, implementing a State machine.
 Sleeping Troubles requires Pygame to be installed. Pygame can be downloaded from http://pygame.org.
