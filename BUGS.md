@@ -1,9 +1,9 @@
 # A list of known bugs
 
-## Pending 
+## Pending
 
-- None
+-   [] Program hangs when playing any sound
 
 ## Fixed
 
-- None
+-   None
