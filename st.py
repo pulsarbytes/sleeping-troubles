@@ -31,7 +31,9 @@ import random
 
 
 class States(object):
+    current_state = 'menu'
     game_on = False
+    game_over = False
     music_on = stconfig.MUSIC_ON
     sound_on = stconfig.SOUND_ON
     screen_copy = None
@@ -47,9 +49,9 @@ class States(object):
 
         # load sounds
         self.sound_button_hover = sthelper.load_sound('button-hover.wav')
-        self.sound_button_hover.set_volume(0.2)
+        self.sound_button_hover.set_volume(0.04)
         self.sound_button_click = sthelper.load_sound('button-click.wav')
-        self.sound_button_click.set_volume(0.5)
+        self.sound_button_click.set_volume(0.1)
 
         # load sound icons
         self.icon_music_on, self.rect_icon_music_on = sthelper.load_image(
@@ -75,21 +77,39 @@ class States(object):
                         States.music_on = True
                     else:
                         States.music_on = False
+
+                    if States.current_state == 'menu' or States.current_state == 'help' or States.current_state == 'credits':
+                        sthelper.play_music('game-music.mp3', 'stop')
+                        sthelper.play_music('lullaby.wav', 'stop')
+                        if States.music_on == False:
+                            sthelper.play_music('menu-music.wav', 'stop')
+                        else:
+                            sthelper.play_music('menu-music.wav')
+                    elif States.current_state == 'game':
+                        sthelper.play_music('menu-music.wav', 'stop')
+                        if States.game_over == False:
+                            if States.music_on == False:
+                                sthelper.play_music('game-music.mp3', 'stop')
+                            else:
+                                sthelper.play_music('game-music.mp3')
+                        else:
+                            if States.music_on == False:
+                                sthelper.play_music('lullaby.wav', 'stop')
+                            else:
+                                sthelper.play_music('lullaby.wav')
                 if soundButton._propGetId() == 'sound_toggle':
                     if States.sound_on == False:
                         States.sound_on = True
                     else:
                         States.sound_on = False
-                sthelper.play_sound(self.sound_button_click)
+                if States.sound_on == True:
+                    sthelper.play_sound(self.sound_button_click)
             if 'enter' in sound_events:
                 if States.sound_on == True:
                     sthelper.play_sound(self.sound_button_hover)
 
     def update(self, screen):
-        if States.music_on == True:
-            pg.mixer.music.unpause()
-        else:
-            pg.mixer.music.pause()
+        pass
 
     def draw(self, screen, background):
         """
@@ -127,9 +147,9 @@ class Menu(States):
     def __init__(self):
         States.__init__(self)
         sthelper.play_music('game-music.mp3', 'stop')
+        sthelper.play_music('lullaby.wav', 'stop')
         if States.music_on == True:
             sthelper.play_music('menu-music.wav')
-            pg.mixer.music.pause()
 
     def get_event(self, event, screen):
         for menuButton in self.menuButtons:
@@ -161,7 +181,7 @@ class Menu(States):
         pass
 
     def startup(self):
-        pass
+        States.current_state = 'menu'
 
     def update(self, screen, dt):
         self.draw(screen)
@@ -426,9 +446,9 @@ class Game(States):
                     self.done = True
                     self.target = 'menu'
                     sthelper.play_music('game-music.mp3', 'stop')
-                    sthelper.play_music('menu-music.wav')
-                    pg.mixer.music.pause()
-                    pg.mixer.pause()
+                    sthelper.play_music('lullaby.wav', 'stop')
+                    if States.music_on == True:
+                        sthelper.play_music('menu-music.wav')
                 if States.sound_on == True:
                     sthelper.play_sound(self.sound_button_click)
             super(Game, self).get_button_events(button_events)
@@ -493,8 +513,8 @@ class Game(States):
                 if takeRiskButton._propGetId() == 'bathroom':
                     self.update_player_position(-11)
                 if takeRiskButton._propGetId() == 'risk':
-                    sthelper.play_sound(self.sound_dream_crystal, 'stop')
                     if States.sound_on == True:
+                        sthelper.play_sound(self.sound_dream_crystal, 'stop')
                         sthelper.play_sound(self.sound_button_click)
                 self.take_risk = False
                 self.dice_locked = False
@@ -519,8 +539,7 @@ class Game(States):
         pass
 
     def startup(self):
-        sthelper.play_music('menu-music.wav', 'stop')
-        pg.mixer.unpause()
+        States.current_state = 'game'
 
         if States.game_on == False:
             self.end = False
@@ -548,15 +567,23 @@ class Game(States):
             self.dice_locked = False
             self.sound_roll_dice_timer = None
             self.current_dice_roll = 0
-            sthelper.play_sound(self.sound_roll_dice, 'stop')
+            if States.sound_on == True:
+                sthelper.play_sound(self.sound_roll_dice, 'stop')
 
             # reset message
             self.message = 'Roll the dice.'
 
         if self.end == True:
-            sthelper.play_music('lullaby.wav')
+            sthelper.play_music('menu-music.wav', 'stop')
+            sthelper.play_music('game-music.mp3', 'stop')
+            States.game_over = True
+            if States.music_on == True:
+                sthelper.play_music('lullaby.wav')
         else:
-            sthelper.play_music('game-music.mp3')
+            sthelper.play_music('menu-music.wav', 'stop')
+            sthelper.play_music('lullaby.wav', 'stop')
+            if States.music_on == True:
+                sthelper.play_music('game-music.mp3')
 
     def roll_dice(self):
         if States.game_on == False:
@@ -584,15 +611,18 @@ class Game(States):
 
         # play square sound
         if self.square_sound:
-            sthelper.play_sound(self.square_sound)
+            if States.sound_on == True:
+                sthelper.play_sound(self.square_sound)
 
         # get position feedback
         self.get_position_feedback()
 
         # decide if game is won or lost
         if self.end == True:
-            States.music_on = True
-            sthelper.play_music('lullaby.wav')
+            sthelper.play_music('menu-music.wav', 'stop')
+            sthelper.play_music('game-music.mp3', 'stop')
+            if States.music_on == True:
+                sthelper.play_music('lullaby.wav')
             if self.tpoints > 0:
                 self.won_game = True
             else:
@@ -1113,8 +1143,10 @@ class Pause(States):
         States.screen_copy = None
 
     def startup(self):
-        pg.mixer.music.pause()
-        pg.mixer.pause()
+        States.current_state = 'pause'
+        sthelper.play_music('game-music.mp3', 'stop')
+        sthelper.play_music('menu-music.wav', 'stop')
+        sthelper.play_music('lullaby.wav', 'stop')
 
     def update(self, screen, dt):
         self.draw(screen)
@@ -1166,7 +1198,7 @@ class Help(States):
         pass
 
     def startup(self):
-        pass
+        States.current_state = 'help'
 
     def update(self, screen, dt):
         self.draw(screen)
@@ -1295,7 +1327,7 @@ class Credits(States):
         pass
 
     def startup(self):
-        pass
+        States.current_state = 'credits'
 
     def update(self, screen, dt):
         self.draw(screen)
