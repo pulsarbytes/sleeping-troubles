@@ -1513,15 +1513,6 @@ if __name__ == '__main__':
     # center pygame window on screen
     os.environ['SDL_VIDEO_CENTERED'] = '1'
 
-    # get path for data folder
-    if getattr(sys, 'frozen', False):
-        # frozen
-        main_dir = os.path.split(os.path.abspath(sys.executable))[0]
-    else:
-        # unfrozen
-        main_dir = os.path.split(os.path.abspath(__file__))[0]
-    data_dir = os.path.join(main_dir, 'data')
-
     run_game()
 
 # Dirty Rects
