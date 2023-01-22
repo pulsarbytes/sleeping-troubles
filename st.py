@@ -6,7 +6,7 @@ Sleeping Troubles is a simple board game, developed with Python and Pygame, impl
 Sleeping Troubles requires Pygame to be installed. Pygame can be downloaded from http://pygame.org.
 Developed by Yannis Maragos. Concept and design by Evi Filakouri.
 
-Copyright (C) 2018  Pulsar Bytes.
+Copyright (C) 2018 Yannis Maragos
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License version 2 only,
@@ -1387,7 +1387,7 @@ class Credits(States):
 
             # add text
             credits_list = [
-                "Sleeping Troubles by Pulsar Bytes",
+                "Sleeping Troubles",
                 "Game concept and design by Evi Filakouri",
                 "Developed by Yannis Maragos",
                 "Developed with Python and Pygame",
